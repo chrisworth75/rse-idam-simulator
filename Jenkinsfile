@@ -71,7 +71,7 @@ pipeline {
 
         stage('Deploy') {
             when {
-                branch 'master'
+                branch 'main'
             }
             steps {
                 script {
@@ -95,7 +95,7 @@ pipeline {
 
         stage('Health Check') {
             when {
-                branch 'master'
+                branch 'main'
             }
             steps {
                 script {
@@ -127,7 +127,7 @@ pipeline {
 
         stage('Integration Tests') {
             when {
-                branch 'master'
+                branch 'main'
             }
             steps {
                 script {
