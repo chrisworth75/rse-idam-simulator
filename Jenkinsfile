@@ -125,6 +125,35 @@ pipeline {
             }
         }
 
+        stage('API Tests') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    // Install Newman for API testing
+                    sh 'npm install -g newman'
+
+                    // Run Postman/Newman API tests
+                    sh '''
+                        echo "🔬 Running IDAM API tests with Newman..."
+                        newman run tests/postman/idam-api.postman_collection.json \\
+                            -e tests/environments/docker.postman_environment.json \\
+                            --reporters cli,json,junit \\
+                            --reporter-json-export newman-results.json \\
+                            --reporter-junit-export newman-results.xml
+                    '''
+                }
+            }
+            post {
+                always {
+                    // Archive Newman test results
+                    junit testResults: 'newman-results.xml', allowEmptyResults: true
+                    archiveArtifacts artifacts: 'newman-results.json', allowEmptyArchive: true, fingerprint: true
+                }
+            }
+        }
+
         stage('Integration Tests') {
             when {
                 branch 'main'

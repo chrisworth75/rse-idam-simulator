@@ -1,0 +1,312 @@
+{
+  "info": {
+    "name": "IDAM Simulator API Newman",
+    "description": "API tests for RSE IDAM Simulator covering authentication, user management and OpenID endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "test_user_email",
+      "value": "test-user@hmcts.net",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Health check returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Health check contains status', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('status');",
+              "    pm.expect(response.status).to.eql('UP');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Create Test User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('User creation returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response contains user data', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('id');",
+              "    pm.expect(response.email).to.eql(pm.variables.get('test_user_email'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{test_user_email}}\",\n  \"forename\": \"Test\",\n  \"surname\": \"User\",\n  \"roles\": [\n    {\n      \"code\": \"citizen\"\n    },\n    {\n      \"code\": \"caseworker\"\n    }\n  ],\n  \"password\": \"TestPassword123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/testing-support/accounts",
+          "host": ["{{baseUrl}}"],
+          "path": ["testing-support", "accounts"]
+        }
+      }
+    },
+    {
+      "name": "Get OpenID Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Token request returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response contains access token', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('access_token');",
+              "    pm.expect(response).to.have.property('token_type');",
+              "    pm.expect(response.token_type).to.eql('Bearer');",
+              "    ",
+              "    // Store token for later use",
+              "    pm.collectionVariables.set('access_token', response.access_token);",
+              "});",
+              "",
+              "pm.test('Token contains required claims', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('scope');",
+              "    pm.expect(response.scope).to.include('openid');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "client_id",
+              "value": "testservice",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "testservice",
+              "type": "text"
+            },
+            {
+              "key": "grant_type",
+              "value": "password",
+              "type": "text"
+            },
+            {
+              "key": "redirect_uri",
+              "value": "https://localhost:3000/callback",
+              "type": "text"
+            },
+            {
+              "key": "username",
+              "value": "{{test_user_email}}",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "TestPassword123",
+              "type": "text"
+            },
+            {
+              "key": "scope",
+              "value": "openid profile roles",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/o/token",
+          "host": ["{{baseUrl}}"],
+          "path": ["o", "token"]
+        }
+      }
+    },
+    {
+      "name": "Get User Details",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('User details returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response contains user information', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('id');",
+              "    pm.expect(response).to.have.property('email');",
+              "    pm.expect(response).to.have.property('forename');",
+              "    pm.expect(response).to.have.property('surname');",
+              "    pm.expect(response).to.have.property('roles');",
+              "});",
+              "",
+              "pm.test('User email matches expected', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.email).to.eql(pm.variables.get('test_user_email'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/details",
+          "host": ["{{baseUrl}}"],
+          "path": ["details"]
+        }
+      }
+    },
+    {
+      "name": "Login Page Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login page returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Login page contains form elements', function () {",
+              "    const responseText = pm.response.text();",
+              "    pm.expect(responseText).to.include('form');",
+              "    pm.expect(responseText).to.include('username');",
+              "    pm.expect(responseText).to.include('password');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/login?redirect_uri=https%3A%2F%2Flocalhost%3A3000%2Fcallback&client_id=testservice&state=12345&ui_local=en",
+          "host": ["{{baseUrl}}"],
+          "path": ["login"],
+          "query": [
+            {
+              "key": "redirect_uri",
+              "value": "https%3A%2F%2Flocalhost%3A3000%2Fcallback"
+            },
+            {
+              "key": "client_id",
+              "value": "testservice"
+            },
+            {
+              "key": "state",
+              "value": "12345"
+            },
+            {
+              "key": "ui_local",
+              "value": "en"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "OIDC Configuration",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('OIDC config returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Contains required OIDC endpoints', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('issuer');",
+              "    pm.expect(response).to.have.property('authorization_endpoint');",
+              "    pm.expect(response).to.have.property('token_endpoint');",
+              "    pm.expect(response).to.have.property('userinfo_endpoint');",
+              "});",
+              "",
+              "pm.test('Supports required grant types', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('grant_types_supported');",
+              "    pm.expect(response.grant_types_supported).to.include('password');",
+              "    pm.expect(response.grant_types_supported).to.include('authorization_code');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/.well-known/openid_configuration",
+          "host": ["{{baseUrl}}"],
+          "path": [".well-known", "openid_configuration"]
+        }
+      }
+    }
+  ]
+}
