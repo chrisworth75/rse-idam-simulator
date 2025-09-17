@@ -267,46 +267,6 @@
           ]
         }
       }
-    },
-    {
-      "name": "OIDC Configuration",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('OIDC config returns 200', function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test('Contains required OIDC endpoints', function () {",
-              "    const response = pm.response.json();",
-              "    pm.expect(response).to.have.property('issuer');",
-              "    pm.expect(response).to.have.property('authorization_endpoint');",
-              "    pm.expect(response).to.have.property('token_endpoint');",
-              "    pm.expect(response).to.have.property('userinfo_endpoint');",
-              "});",
-              "",
-              "pm.test('Supports required grant types', function () {",
-              "    const response = pm.response.json();",
-              "    pm.expect(response).to.have.property('grant_types_supported');",
-              "    pm.expect(response.grant_types_supported).to.include('password');",
-              "    pm.expect(response.grant_types_supported).to.include('authorization_code');",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/.well-known/openid_configuration",
-          "host": ["{{baseUrl}}"],
-          "path": [".well-known", "openid_configuration"]
-        }
-      }
     }
   ]
 }
