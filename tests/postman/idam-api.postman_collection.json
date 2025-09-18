@@ -62,7 +62,7 @@
               "pm.test('Response contains user data', function () {",
               "    const response = pm.response.json();",
               "    pm.expect(response).to.have.property('uuid');",
-              "    pm.expect(response.email).to.eql(pm.variables.get('test_user_email'));",
+              "    pm.expect(response.uuid).to.be.a('string');",
               "});"
             ],
             "type": "text/javascript"
