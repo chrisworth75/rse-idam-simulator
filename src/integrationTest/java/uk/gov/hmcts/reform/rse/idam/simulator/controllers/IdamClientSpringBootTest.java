@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -62,6 +63,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     LiveMemoryService.class, PersistentStorageService.class, SimulatorService.class, JsonWebKeyService.class,
     JwTokenGeneratorService.class, OpenIdConfigService.class},
     webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@TestPropertySource(properties = {
+    "server.port=15556"
+})
 @PropertySource("classpath:application.yaml")
 @EnableAutoConfiguration
 public class IdamClientSpringBootTest {

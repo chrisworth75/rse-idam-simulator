@@ -1,8 +1,21 @@
 ---
+server:
+  port: 15556  # Use different port for integration tests
+
 idam:
   api:
-    url: 'http://localhost:5556'
+    url: 'http://localhost:15556'
   client:
     id: 'bsp'
     secret: '123456'
-    redirect_uri: 'https://localhost:5556/receiver'
+    redirect_uri: 'https://localhost:15556/receiver'
+
+simulator:
+  jwt:
+    issuer: http://localhost:15556
+    expiration: 28800000
+  openid:
+    base-url: http://localhost:15556
+    base-url-outside-network: http://localhost:15556
+  storage:
+    type: memory
