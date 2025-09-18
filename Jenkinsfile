@@ -131,6 +131,28 @@ pipeline {
             }
             steps {
                 script {
+                    // Install Node.js if not available
+                    sh '''
+                        if ! command -v node &> /dev/null; then
+                            echo "Installing Node.js..."
+                            if [[ "$OSTYPE" == "darwin"* ]]; then
+                                # macOS - use Homebrew or direct download
+                                if command -v brew &> /dev/null; then
+                                    brew install node
+                                else
+                                    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+                                    export NVM_DIR="$HOME/.nvm"
+                                    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+                                    nvm install node
+                                fi
+                            else
+                                # Linux - use NodeSource repository
+                                curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+                                sudo apt-get install -y nodejs
+                            fi
+                        fi
+                    '''
+
                     // Install Newman for API testing
                     sh 'npm install -g newman'
 
