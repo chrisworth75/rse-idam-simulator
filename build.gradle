@@ -140,3 +140,14 @@ bootJar {
     attributes('Implementation-Version': project.version.toString())
   }
 }
+
+// Task to generate Postman collection
+task generatePostmanCollection(type: Exec) {
+  group = 'build'
+  description = 'Generate Postman collection for API endpoints'
+  commandLine 'node', 'generate-collection.js'
+}
+
+// Make the build task depend on Postman collection generation
+build.dependsOn generatePostmanCollection
+generatePostmanCollection.mustRunAfter compileJava

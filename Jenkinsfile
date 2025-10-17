@@ -57,6 +57,12 @@ pipeline {
             }
         }
 
+        stage('Archive Build Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'build/postman/*.postman_collection.json', fingerprint: true, allowEmptyArchive: true
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {

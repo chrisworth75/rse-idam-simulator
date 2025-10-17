@@ -4,6 +4,7 @@
 *.class
 bin/main/application.yaml
 users.db
+build/postman/
 
 ### STS ###
 .apt_generated
