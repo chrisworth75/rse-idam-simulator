@@ -81,6 +81,12 @@ pipeline {
             }
             steps {
                 script {
+                    // Kill any process using port 5556
+                    sh """
+                        echo "Killing any process using port 5556..."
+                        lsof -ti:5556 | xargs kill -9 || true
+                    """
+
                     // Stop existing container if running
                     sh """
                         docker stop ${IMAGE_NAME} || true
